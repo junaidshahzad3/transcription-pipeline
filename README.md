@@ -21,6 +21,8 @@ uvicorn app.main:app --reload
 curl -F "file=@samples/meeting.mp3" http://localhost:8000/v1/transcriptions
 ```
 
+On Windows you can also double-click `setup_windows.bat` (installs FFmpeg with winget, creates a virtual env, installs packages and runs the tests), then drag an audio file onto `transcribe.bat`. It saves a JSON transcript and an SRT file next to the audio.
+
 The first run downloads the Whisper model (`small` by default, about 460 MB). Set `WHISPER_MODEL=tiny` for a fast try, or `base`, `medium` or `large-v3` for more accuracy.
 
 Run the tests (they use a mock engine, so no model download is needed):
