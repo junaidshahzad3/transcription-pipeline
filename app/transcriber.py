@@ -25,6 +25,25 @@ class Transcriber(Protocol):
         ...
 
 
+def load_wav(path: str):
+    """Read a 16 kHz mono 16-bit PCM WAV (what normalize_audio writes) as float32 samples.
+
+    The pipeline already decoded the input with FFmpeg, so the model gets raw samples.
+    Passing a path would make faster-whisper decode it again with PyAV, and newer PyAV
+    releases (19+) reject the `metadata_errors` argument that faster-whisper 1.2 passes.
+    """
+    import wave
+
+    import numpy as np
+
+    with wave.open(path, "rb") as w:
+        if w.getsampwidth() != 2 or w.getnchannels() != 1:
+            raise ValueError(f"expected 16-bit mono WAV, got {w.getsampwidth() * 8}-bit "
+                             f"{w.getnchannels()}-channel")
+        frames = w.readframes(w.getnframes())
+    return np.frombuffer(frames, dtype=np.int16).astype(np.float32) / 32768.0
+
+
 class FasterWhisperTranscriber:
     """Open-source Whisper on CTranslate2. Runs on CPU (int8) or GPU (float16)."""
 
@@ -36,7 +55,7 @@ class FasterWhisperTranscriber:
 
     def transcribe(self, wav_path, language=None, word_timestamps=False):
         segments, info = self.model.transcribe(
-            wav_path,
+            load_wav(wav_path),         # samples, not a path: skips faster-whisper's PyAV decode
             language=language,          # None = auto detect
             vad_filter=True,            # skip silence, fewer hallucinated words
             beam_size=5,

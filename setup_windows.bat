@@ -31,6 +31,8 @@ if errorlevel 1 (
   winget install --id Gyan.FFmpeg -e --accept-source-agreements --accept-package-agreements
   set "PATH=%PATH%;%LOCALAPPDATA%\Microsoft\WinGet\Links"
 )
+REM winget does not always create the Links shortcuts; fall back to the package folder
+for /d %%D in ("%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg*") do for /d %%E in ("%%D\ffmpeg-*") do set "PATH=%PATH%;%%E\bin"
 where ffmpeg >nul 2>nul
 if errorlevel 1 (
   echo FFmpeg is still not on PATH. Close this window, open a new one and run setup_windows.bat again.

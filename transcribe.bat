@@ -4,6 +4,7 @@ REM   transcribe.bat "C:\path\to\recording.mp3"
 setlocal
 cd /d "%~dp0"
 set "PATH=%PATH%;%LOCALAPPDATA%\Microsoft\WinGet\Links"
+for /d %%D in ("%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg*") do for /d %%E in ("%%D\ffmpeg-*") do set "PATH=%PATH%;%%E\bin"
 if "%~1"=="" (
   echo Drag an audio file onto transcribe.bat, or run: transcribe.bat "C:\path\to\file.mp3"
   pause & exit /b 1

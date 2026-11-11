@@ -2,6 +2,7 @@
 import logging
 import os
 import shutil
+import tempfile
 import uuid
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
@@ -18,7 +19,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 ALLOWED_EXT = {".wav", ".mp3", ".m4a", ".aac", ".flac", ".ogg", ".opus", ".webm", ".mp4", ".mov"}
 MAX_BYTES = int(os.getenv("MAX_UPLOAD_MB", "500")) * 1024 * 1024
 SYNC_LIMIT_SECONDS = float(os.getenv("SYNC_LIMIT_SECONDS", "300"))  # longer files go async
-UPLOAD_DIR = os.getenv("UPLOAD_DIR", "/tmp/stt_uploads")
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", os.path.join(tempfile.gettempdir(), "stt_uploads"))
 
 app = FastAPI(title="Transcription Pipeline", version="1.0.0")
 _engine = None
